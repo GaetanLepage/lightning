@@ -521,6 +521,7 @@ class LightningModule(
     def log_dict(
         self,
         dictionary: Union[Mapping[str, _METRIC], MetricCollection],
+        prefix: Optional[str] = None,
         prog_bar: bool = False,
         logger: Optional[bool] = None,
         on_step: Optional[bool] = None,
@@ -543,6 +544,8 @@ class LightningModule(
         Args:
             dictionary: key value pairs.
                 The values can be a ``float``, ``Tensor``, ``Metric``, or ``MetricCollection``.
+            prefix: an optional string to add before each dictionary key.
+                Example: ``"train/"``
             prog_bar: if ``True`` logs to the progress base.
             logger: if ``True`` logs to the logger.
             on_step: if ``True`` logs at this step.
@@ -577,9 +580,10 @@ class LightningModule(
             if _TORCHMETRICS_GREATER_EQUAL_0_9_1 and dictionary._enable_compute_groups:
                 kwargs["copy_state"] = False
 
+        prefix: str = prefix or ""
         for k, v in dictionary.items(**kwargs):
             self.log(
-                name=k,
+                name=prefix + k,
                 value=v,
                 prog_bar=prog_bar,
                 logger=logger,
